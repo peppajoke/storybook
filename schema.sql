@@ -1,20 +1,3 @@
--- Characters Table
-CREATE TABLE Characters (
-    id INT PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    str INT NOT NULL,
-    dex INT NOT NULL,
-    int INT NOT NULL,
-    con INT NOT NULL,
-    cha INT NOT NULL,
-    playerCharacter BOOLEAN NOT NULL,
-    deathFork INT,
-    health INT NOT NULL,
-    power INT NOT NULL,
-    FOREIGN KEY (deathFork) REFERENCES Forks(id)
-);
-
--- Items Table
 CREATE TABLE Items (
     id INT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -25,85 +8,120 @@ CREATE TABLE Items (
     useDialogue TEXT
 );
 
--- Inventory Table (for character-item relationships)
-CREATE TABLE Inventory (
+CREATE TABLE Characters (
+    id INT PRIMARY KEY,
+    firstName VARCHAR(255) NOT NULL,
+    lastName VARCHAR(255) NOT NULL,
+    gender VARCHAR(1) NOT NULL,
+    description TEXT NOT NULL,
+    birthdate DATE NOT NULL,
+    parentId INT,
+    health INT NOT NULL DEFAULT 5,
+    currentNodeId INT,
+    FOREIGN KEY (currentNodeId) REFERENCES Nodes(id),
+    FOREIGN KEY (parentId) REFERENCES Characters(id)
+);
+
+CREATE TABLE Nodes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    gameId INT NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES Game(id)
+);
+
+CREATE TABLE NodeStatChanges (
+    nodeId INT NOT NULL,
+    characterId INT,
+    stat VARCHAR(30) NOT NULL,
+    change INT NOT NULL,
+    PRIMARY KEY (nodeId, characterId, stat),
+    FOREIGN KEY (characterId) REFERENCES Characters(id),
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id)
+);
+
+CREATE TABLE Locations (
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    x INT NOT NULL,
+    y INT NOT NULL
+);
+
+CREATE TABLE LocationOverrides (
+    locationId INT NOT NULL,
+    nodeId INT NOT NULL,
+    description TEXT NOT NULL,
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id),
+    FOREIGN KEY (locationId) REFERENCES Locations(id)
+);
+
+CREATE TABLE NodeAction (
+    Id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    nodeId INT NOT NULL,
+    characterId INT NOT NULL,
+    description TEXT NOT NULL,
+    FOREIGN KEY (nodeId) REFERENCES Nods(id),
+    FOREIGN KEY (characterId) REFERENCES Characters(id)
+);
+
+CREATE TABLE NodeActionCharacter (
+    nodeId INT NOT NULL,
     characterId INT NOT NULL,
     itemId INT NOT NULL,
-    PRIMARY KEY (characterId, itemId),
+    quantityChange INT NOT NULL,
+    PRIMARY KEY (nodeId, characterId, itemId),
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id),
     FOREIGN KEY (characterId) REFERENCES Characters(id),
     FOREIGN KEY (itemId) REFERENCES Items(id)
 );
 
--- Relationships Table (for character-character relationships)
-CREATE TABLE Relationships (
-    characterId1 INT NOT NULL,
-    characterId2 INT NOT NULL,
-    relationshipLevel INT NOT NULL,
-    PRIMARY KEY (characterId1, characterId2),
-    FOREIGN KEY (characterId1) REFERENCES Characters(id),
-    FOREIGN KEY (characterId2) REFERENCES Characters(id)
-);
-
--- Forks Table
-CREATE TABLE Forks (
-    id INT PRIMARY KEY,
-    text TEXT NOT NULL
-);
-
--- Choices Table (for fork choices)
-CREATE TABLE Choices (
-    id INT PRIMARY KEY,
-    forkId INT NOT NULL,
-    text VARCHAR(255) NOT NULL,
-    nextFork INT,
-    skillCheckSkill VARCHAR(255),
-    skillCheckDifficulty INT,
-    successFork INT,
-    failureFork INT,
-    relationshipChangeTarget INT,
-    relationshipChangeAmount INT,
-    itemRequirement INT,
-    itemRemoval INT,
-    itemAddition INT,
-    battleEnemy INT,
-    battleWinFork INT,
-    battleLoseFork INT,
-    updateDeathFork INT,
-    powerChange INT,
-    FOREIGN KEY (forkId) REFERENCES Forks(id),
-    FOREIGN KEY (nextFork) REFERENCES Forks(id),
-    FOREIGN KEY (successFork) REFERENCES Forks(id),
-    FOREIGN KEY (failureFork) REFERENCES Forks(id),
-    FOREIGN KEY (relationshipChangeTarget) REFERENCES Characters(id),
-    FOREIGN KEY (itemRequirement) REFERENCES Items(id),
-    FOREIGN KEY (itemRemoval) REFERENCES Items(id),
-    FOREIGN KEY (itemAddition) REFERENCES Items(id),
-    FOREIGN KEY (battleEnemy) REFERENCES Characters(id),
-    FOREIGN KEY (battleWinFork) REFERENCES Forks(id),
-    FOREIGN KEY (battleLoseFork) REFERENCES Forks(id),
-    FOREIGN KEY (updateDeathFork) REFERENCES Forks(id)
-);
-
--- Endings Table
-CREATE TABLE Endings (
-    id INT PRIMARY KEY,
-    text TEXT NOT NULL,
-    type VARCHAR(255) NOT NULL
-);
-
--- EndingConditions Table
-CREATE TABLE EndingConditions(
+CREATE TABLE NodeItemChanges (
+    nodeId INT NOT NULL,
     characterId INT NOT NULL,
-    condition VARCHAR(255) NOT NULL,
-    endingId INT NOT NULL,
-    PRIMARY KEY (characterId,condition),
+    itemId INT NOT NULL,
+    quantityChange INT NOT NULL,
+    PRIMARY KEY (nodeId, characterId, itemId),
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id),
     FOREIGN KEY (characterId) REFERENCES Characters(id),
-    FOREIGN KEY(endingId) REFERENCES Endings(id)
+    FOREIGN KEY (itemId) REFERENCES Items(id)
 );
 
--- GlobalDeathFork Table.
-CREATE TABLE GlobalDeathFork(
-    id INT PRIMARY KEY,
-    forkID INT NOT NULL,
-    FOREIGN KEY (forkID) REFERENCES Forks(id)
+CREATE TABLE NodeDialogue(
+    nodeId INT NOT NULL,
+    characterId INT NOT NULL,
+    toCharacterId INT NOT NULL,
+    message TEXT NOT NULL,
+    PRIMARY KEY (nodeId, characterId),
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id),
+    FOREIGN KEY (CharacterId) REFERENCES Characters(id),
+    FOREIGN KEY (toCharacterId) REFERENCES Characters(id)
+);
+
+CREATE TABLE NodeHealthChanges (
+    nodeId INT NOT NULL,
+    characterId INT NOT NULL,
+    toCharacterId INT NOT NULL,
+    healthChange INT NOT NULL,
+    PRIMARY KEY (nodeId, characterId, toCharacterId),
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id),
+    FOREIGN KEY (characterId) REFERENCES Characters(id)
+    FOREIGN KEY (toCharacterId) REFERENCES Characters(id)
+);
+
+CREATE TABLE Game (
+    gameId INT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    parentCharacterId INT NOT NULL,
+    maxNodes INT NOT NULL,
+    FOREIGN KEY (parentCharacterId) REFERENCES Characters(id),
+);
+
+CREATE TABLE NodeHealthChanges (
+    nodeId INT NOT NULL,
+    characterId INT NOT NULL,
+    toCharacterId INT NOT NULL,
+    healthChange INT NOT NULL,
+    PRIMARY KEY (nodeId, characterId),
+    FOREIGN KEY (nodeId) REFERENCES Nodes(id),
+    FOREIGN KEY (characterId) REFERENCES Characters(id),
+    FOREIGN KEY (toCharacterId) REFERENCES Characters(id)
 );

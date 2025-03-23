@@ -38,6 +38,7 @@ jobs:
 
       - name: Apply Schema
         run: |
+          set -e
           PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -f ON_ERROR_STOP=1 init.sql
 
       - name: Run Basic Query Test

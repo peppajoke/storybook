@@ -1,6 +1,6 @@
-CREATE DATABASE GameWorld;
+BEGIN;
 
-USE GameWorld;
+CREATE DATABASE GameWorld;
 
 CREATE TABLE Items (
     id INT SERIAL PRIMARY KEY,
@@ -129,3 +129,5 @@ CREATE TABLE NodeHealthChanges (
     FOREIGN KEY (characterId) REFERENCES Characters(id),
     FOREIGN KEY (toCharacterId) REFERENCES Characters(id)
 );
+
+END;

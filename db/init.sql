@@ -1,29 +1,11 @@
-CREATE DATABASE GameWorld;
-
-USE GameWorld;
-
 CREATE TABLE Items (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     skill VARCHAR(255) NOT NULL,
     power INT NOT NULL,
     description TEXT,
     stackable BOOLEAN NOT NULL,
     useDialogue TEXT
-);
-
-CREATE TABLE Game (
-    gameId INT PRIMARY KEY NOT NULL,
-    name TEXT NOT NULL,
-    parentCharacterId INT NOT NULL,
-    maxNodes INT NOT NULL,
-    FOREIGN KEY (parentCharacterId) REFERENCES Characters(id)
-);
-
-CREATE TABLE Nodes (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    gameId INT NOT NULL,
-    FOREIGN KEY (gameId) REFERENCES Game(id)
 );
 
 CREATE TABLE Characters (
@@ -38,6 +20,12 @@ CREATE TABLE Characters (
     currentNodeId INT,
     FOREIGN KEY (currentNodeId) REFERENCES Nodes(id),
     FOREIGN KEY (parentId) REFERENCES Characters(id)
+);
+
+CREATE TABLE Nodes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    gameId INT NOT NULL,
+    FOREIGN KEY (gameId) REFERENCES Game(id)
 );
 
 CREATE TABLE NodeStatChanges (
@@ -115,8 +103,16 @@ CREATE TABLE NodeHealthChanges (
     healthChange INT NOT NULL,
     PRIMARY KEY (nodeId, characterId, toCharacterId),
     FOREIGN KEY (nodeId) REFERENCES Nodes(id),
-    FOREIGN KEY (characterId) REFERENCES Characters(id),
+    FOREIGN KEY (characterId) REFERENCES Characters(id)
     FOREIGN KEY (toCharacterId) REFERENCES Characters(id)
+);
+
+CREATE TABLE Game (
+    gameId INT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    parentCharacterId INT NOT NULL,
+    maxNodes INT NOT NULL,
+    FOREIGN KEY (parentCharacterId) REFERENCES Characters(id),
 );
 
 CREATE TABLE NodeHealthChanges (

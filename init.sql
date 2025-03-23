@@ -4,7 +4,7 @@ CREATE DATABASE GameWorld;
 BEGIN;
 
 CREATE TABLE Items (
-    id INT SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     skill VARCHAR(255) NOT NULL,
     power INT NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE Items (
 );
 
 CREATE TABLE Game (
-    gameId INT SERIAL PRIMARY KEY NOT NULL,
+    gameId SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     parentCharacterId INT NOT NULL,
     maxNodes INT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE Game (
 );
 
 CREATE TABLE Nodes (
-    id INT SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     gameId INT NOT NULL,
     FOREIGN KEY (gameId) REFERENCES Game(id)
 );
@@ -52,7 +52,7 @@ CREATE TABLE NodeStatChanges (
 );
 
 CREATE TABLE Locations (
-    id INT NOT NULL SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     x INT NOT NULL,
@@ -68,7 +68,7 @@ CREATE TABLE LocationOverrides (
 );
 
 CREATE TABLE NodeAction (
-    Id INT NOT NULL SERIAL PRIMARY KEY,
+    Id SERIAL PRIMARY KEY,
     nodeId INT NOT NULL,
     characterId INT NOT NULL,
     description TEXT NOT NULL,

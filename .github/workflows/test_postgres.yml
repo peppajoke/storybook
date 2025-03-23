@@ -1,0 +1,45 @@
+name: Test PostgreSQL Schema
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: myuser
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_DB: mydatabase
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U myuser -d mydatabase"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL Client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Wait for PostgreSQL to be Ready
+        run: sleep 10
+
+      - name: Apply Schema
+        run: |
+          PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -f init.sql
+
+      - name: Run Basic Query Test
+        run: |
+          PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -c "SELECT tablename FROM pg_tables WHERE schemaname='public';"

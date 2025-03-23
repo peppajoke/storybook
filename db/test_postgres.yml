@@ -38,7 +38,7 @@ jobs:
 
       - name: Apply Schema
         run: |
-          PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -f db/init.sql
+          PGPASSWORD=mypassword psql -h localhost -U myuser -d mydatabase -f init.sql
 
       - name: Run Basic Query Test
         run: |

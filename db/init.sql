@@ -1,10 +1,9 @@
 CREATE TABLE Items (
     id INT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    skill VARCHAR(255) NOT NULL,
+    skill VARCHAR(30) NOT NULL,
     power INT NOT NULL,
     description TEXT,
-    stackable BOOLEAN NOT NULL,
     useDialogue TEXT
 );
 
@@ -17,8 +16,6 @@ CREATE TABLE Characters (
     birthdate DATE NOT NULL,
     parentId INT,
     health INT NOT NULL DEFAULT 5,
-    currentNodeId INT,
-    FOREIGN KEY (currentNodeId) REFERENCES Nodes(id),
     FOREIGN KEY (parentId) REFERENCES Characters(id)
 );
 
